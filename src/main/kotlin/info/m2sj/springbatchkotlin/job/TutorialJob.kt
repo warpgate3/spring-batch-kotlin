@@ -4,13 +4,14 @@ import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.JdbcPagingItemReader
+import org.springframework.batch.item.json.JacksonJsonObjectReader
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import java.net.URL
 
 @Configuration
 class TutorialJob(
@@ -18,29 +19,44 @@ class TutorialJob(
     val stepBuilderFactory: StepBuilderFactory
 ) {
 
-    fun tutorialJob(): Job {
+    @Bean
+    fun jobOfTutorial(): Job {
         return jobBuilderFactory.get("tutorialJob")
             .start(tutorialStep())
+            .incrementer(RunIdIncrementer())
             .build()
     }
 
-    private fun tutorialStep(): Step {
+    @Bean
+    fun tutorialStep(): Step {
         return stepBuilderFactory.get("tutorialStep")
-            .chunk<String, String>(100)
+            .chunk<Box, Box>(1)
             .reader(reader())
             .writer(writer())
             .build()
     }
 
-    private fun writer(): ItemWriter<String> {
-        return ItemWriter<String> {
-            println(">>>>${it}")
+    @Bean
+    fun writer(): ItemWriter<Box> {
+        return ItemWriter<Box> {
+            it.forEach { item -> println(item.name) }
         }
     }
 
-    private fun reader(): ItemReader<String> {
-        return JsonItemReaderBuilder<String>().name("jsonItemReader")
-            .resource(ClassPathResource("info/m2sj/springbatchkotlin/job/tutorial.json"))
+    @Bean
+    fun reader(): ItemReader<Box> {
+        val r = JsonItemReaderBuilder<Box>().name("jsonItemReader")
+            .resource(
+                ClassPathResource("/tutorial.json")
+            )
+            .jsonObjectReader(JacksonJsonObjectReader(Box::class.java))
             .build()
+        return r
+    }
+}
+
+data class Box(val name: String?) {
+    constructor() : this(null) {
+
     }
 }

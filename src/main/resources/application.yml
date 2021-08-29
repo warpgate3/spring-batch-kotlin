@@ -1,7 +1,11 @@
 spring:
   datasource:
-    password: batch
-    username: batch1234
+    username: batch
+    password: batch1234
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5555/batchdb
-k
+  main:
+    allow-bean-definition-overriding: true
+#  batch:
+#    jdbc:
+#      initialize-schema: always
