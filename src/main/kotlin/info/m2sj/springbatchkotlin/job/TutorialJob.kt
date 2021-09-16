@@ -7,16 +7,20 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.JdbcBatchItemWriter
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder
 import org.springframework.batch.item.json.JacksonJsonObjectReader
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
+import javax.sql.DataSource
 
 @Configuration
 class TutorialJob(
     val jobBuilderFactory: JobBuilderFactory,
-    val stepBuilderFactory: StepBuilderFactory
+    val stepBuilderFactory: StepBuilderFactory,
+    val dataSource: DataSource
 ) {
 
     @Bean
@@ -37,10 +41,18 @@ class TutorialJob(
     }
 
     @Bean
-    fun writer(): ItemWriter<Box> {
-        return ItemWriter<Box> {
-            it.forEach { item -> println(item.name) }
-        }
+    fun writer(): JdbcBatchItemWriter<Box> {
+//        return ItemWriter<Box> {
+//            it.forEach { item -> println(item.name) }
+//        }
+
+        val jdbcBatchItemWriter = JdbcBatchItemWriterBuilder<Box>()
+            .dataSource(dataSource)
+            .sql("insert into tutorial_table (name) values (:name)")
+            .beanMapped()
+            .build()
+
+        return jdbcBatchItemWriter
     }
 
     @Bean
