@@ -39,9 +39,9 @@ class DbToDb(
     fun db2dbStep(): Step {
         return stepBuilderFactory.get("db2dbStep")
             .chunk<Box, Box>(1)
-            .reader(reader())
-            .processor(processor())
-            .writer(writer())
+            .reader(db2dbReader())
+            .processor(db2dbProcessor())
+            .writer(db2dbWriter())
             .build()
     }
 
