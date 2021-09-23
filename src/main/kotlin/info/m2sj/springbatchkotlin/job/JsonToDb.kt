@@ -23,39 +23,34 @@ class TutorialJob(
 ) {
 
     @Bean
-    fun jobOfTutorial(): Job {
-        return jobBuilderFactory.get("tutorialJob")
-            .start(tutorialStep())
+    fun db2dbJob(): Job {
+        return jobBuilderFactory.get("json2DbJob")
+            .start(db2dbStep())
             .incrementer(RunIdIncrementer())
             .build()
     }
 
-    @Bean
-    fun tutorialStep(): Step {
-        return stepBuilderFactory.get("tutorialStep")
+    fun db2dbStep(): Step {
+        return stepBuilderFactory.get("json2DbStep")
             .chunk<Box, Box>(1)
-            .reader(reader())
-            .writer(writer())
+            .reader(json2dbReader())
+            .writer(json2dbWriter())
             .build()
     }
 
-    @Bean
-    fun writer(): JdbcBatchItemWriter<Box> {
-//        return ItemWriter<Box> {
-//            it.forEach { item -> println(item.name) }
-//        }
-
+    @Bean(name= ["json2dbWriter"])
+    fun json2dbWriter(): JdbcBatchItemWriter<Box> {
         val jdbcBatchItemWriter = JdbcBatchItemWriterBuilder<Box>()
             .dataSource(dataSource)
-            .sql("insert into tutorial_table (name) values (:name)")
+            .sql("insert into test1 (name) values (:name)")
             .beanMapped()
             .build()
 
         return jdbcBatchItemWriter
     }
 
-    @Bean
-    fun reader(): ItemReader<Box> {
+    @Bean(name= ["json2dbReader"])
+    fun json2dbReader(): ItemReader<Box> {
         val r = JsonItemReaderBuilder<Box>().name("jsonItemReader")
             .resource(
                 ClassPathResource("/tutorial.json")
@@ -63,11 +58,5 @@ class TutorialJob(
             .jsonObjectReader(JacksonJsonObjectReader(Box::class.java))
             .build()
         return r
-    }
-}
-
-data class Box(val name: String?) {
-    constructor() : this(null) {
-
     }
 }

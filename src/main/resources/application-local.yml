@@ -1,0 +1,14 @@
+spring:
+  db1:
+    datasource:
+      username: batch
+      password: batch1234
+      driver-class-name: org.postgresql.Driver
+      jdbcUrl: jdbc:postgresql://localhost:5555/batchdb
+
+  db2:
+    datasource:
+      username: batch
+      password: batch1234
+      driver-class-name: org.postgresql.Driver
+      jdbcUrl: jdbc:postgresql://localhost:5555/batchdb
