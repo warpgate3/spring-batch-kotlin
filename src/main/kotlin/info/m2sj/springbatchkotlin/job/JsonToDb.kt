@@ -23,14 +23,14 @@ class TutorialJob(
 ) {
 
     @Bean
-    fun db2dbJob(): Job {
+    fun json2DbJob(): Job {
         return jobBuilderFactory.get("json2DbJob")
-            .start(db2dbStep())
+            .start(json2DbStep())
             .incrementer(RunIdIncrementer())
             .build()
     }
 
-    fun db2dbStep(): Step {
+    fun json2DbStep(): Step {
         return stepBuilderFactory.get("json2DbStep")
             .chunk<Box, Box>(1)
             .reader(json2dbReader())

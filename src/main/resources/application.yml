@@ -9,6 +9,13 @@ spring:
 #  batch:
 #    jdbc:
 #      initialize-schema: always
+  batch:
+#   jdbc:
+#     initialize-schema: always
+   job:
+#
+#     names: ${job.name:NONE} #program arguments 없을 경우 default를 NONE
+     enabled: false # true 일 경우 batch 자동 실행 , false 일경우 실행 되지 않는다.
 logging:
   level:
     web: trace
