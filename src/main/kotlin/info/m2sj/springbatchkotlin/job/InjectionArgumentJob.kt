@@ -6,6 +6,8 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
+import org.springframework.batch.core.job.CompositeJobParametersValidator
+import org.springframework.batch.core.job.DefaultJobParametersValidator
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
@@ -23,6 +25,7 @@ class InjectionArgumentJob(
     fun inJeArgJob(): Job {
         return jobBuilderFactory.get("inJeArgJob")
             .start(inJeArgStep(null))
+            .validator(validator())
             .incrementer(RunIdIncrementer())
             .build()
     }
@@ -52,5 +55,17 @@ class InjectionArgumentJob(
         return ItemReader<String> {
             "[${name}]"
         }
+    }
+
+    @Bean(name = ["validator"])
+    fun validator(): CompositeJobParametersValidator {
+        val cvs = CompositeJobParametersValidator()
+
+        val djv = DefaultJobParametersValidator(arrayOf("name"), arrayOf())
+
+        djv.afterPropertiesSet()
+        cvs.setValidators(listOf(djv))
+
+        return cvs
     }
 }
