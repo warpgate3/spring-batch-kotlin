@@ -68,4 +68,8 @@ class InjectionArgumentJob(
 
         return cvs
     }
+
+    fun oneTo(start: Int, action: (Int) -> Unit) {
+        (1..start).forEach { action(it) }
+    }
 }
